@@ -1,6 +1,6 @@
 module('Validate Form', {
   setup: function() {
-    ClientSideValidations.forms['new_user'] = {
+    window['new_user'] = {
       type: 'ActionView::Helpers::FormBuilder',
       input_tag: '<div class="field_with_errors"><span id="input_tag" /><label for="user_name" class="message"></label></div>',
       label_tag: '<div class="field_with_errors"><label id="label_tag" /></div>',
@@ -64,14 +64,3 @@ asyncTest('Validate form with an input changed to false', 1, function() {
   }, 30);
 });
 
-asyncTest('Ensure ajax:beforeSend is not from a bubbled event', 1, function() {
-  var form = $('form#new_user'), input = form.find('input#user_name');
-
-  form
-    .append('<a />')
-    .find('a').trigger('ajax:beforeSend');
-  setTimeout(function() {
-    start();
-    ok(!input.parent().hasClass('field_with_errors'));
-  });
-});

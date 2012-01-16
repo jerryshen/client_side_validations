@@ -6,6 +6,8 @@ module ClientSideValidations::ActionView::Helpers
       options = args.extract_options!
       if options[:validate]
 
+        content_for_name = options[:validate] unless options[:validate] == true
+
         # Always turn off HTML5 Validations
         options[:html] ||= {}
         options[:html][:novalidate] = 'novalidate'
@@ -21,27 +23,17 @@ module ClientSideValidations::ActionView::Helpers
       end
 
       @validators = {}
-
       # Order matters here. Rails mutates the options object
       script = client_side_form_settings(object, options)
       form   = super(record_or_name_or_array, *(args << options), &proc)
-
       # Because of the load order requirement above this sub is necessary
       # Would be nice to not do this
       script = insert_validators_into_script(script)
-
-      if assign_script_to_content_for(options[:validate], script)
-        form.html_safe
-      else
-        "#{form}#{script}".html_safe
+      if content_for_name
+        content_for(content_for_name) { script.html_safe }
+        script = nil
       end
-    end
-
-    def assign_script_to_content_for(name, script)
-      if name && name != true
-        content_for(name) { script.html_safe }
-        true
-      end
+      "#{form}#{script}".html_safe
     end
 
     def apply_form_for_options!(object_or_array, options)
@@ -83,7 +75,7 @@ module ClientSideValidations::ActionView::Helpers
         end
 
         content_tag(:script) do
-          "window.ClientSideValidations.forms['#{var_name}'] = #{builder.client_side_form_settings(options, self).merge(:validators => 'validator_hash').to_json};".html_safe
+          "window['#{var_name}'] = #{builder.client_side_form_settings(options, self).merge(:validators => 'validator_hash').to_json};".html_safe
         end
 
       end

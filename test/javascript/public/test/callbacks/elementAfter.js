@@ -1,6 +1,6 @@
 module('Element Validate After Callback', {
   setup: function() {
-    ClientSideValidations.forms['new_user'] = {
+    window['new_user'] = {
       type: 'ActionView::Helpers::FormBuilder',
       input_tag: '<div class="field_with_errors"><span id="input_tag" /><label for="user_name" class="message"></label></div>',
       label_tag: '<div class="field_with_errors"><label id="label_tag" /></div>',
@@ -24,13 +24,13 @@ module('Element Validate After Callback', {
         }))
         .append($('<label for="user_name">Name</label>'));
 
-    ClientSideValidations.callbacks.element.after = function(element, message) {
+    clientSideValidations.callbacks.element.after = function(element, message) {
       $('#result').text('Element Validate After ' + element.attr('id'));
     }
     $('form#new_user').validate();
   },
   teardown: function() {
-    ClientSideValidations.callbacks.element.after = function(element, eventData) {}
+    clientSideValidations.callbacks.element.after = function(element, eventData) {}
   }
 });
 

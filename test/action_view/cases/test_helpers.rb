@@ -39,7 +39,7 @@ class ClientSideValidations::ActionViewHelpersTest < ActionView::TestCase
   end
 
   def test_file_field
-    form_for(@post, :validate => true, :html => {:multipart => true}) do |f|
+    form_for(@post, :validate => true) do |f|
       concat f.file_field(:cost)
     end
 
@@ -233,15 +233,6 @@ class ClientSideValidations::ActionViewHelpersTest < ActionView::TestCase
     end
     assert_equal expected, output_buffer
   end
-  
-  def test_with_custom_name_for_input
-    form_for(@post, :validate => true) do |f|
-      concat f.text_field(:cost, :name => 'price')
-    end
-    
-    assert_match /"price":/, output_buffer
-    assert_no_match /post\[cost\]/, output_buffer
-  end
 
   def test_ignore_an_individual_validator
     hash = {
@@ -360,20 +351,20 @@ class ClientSideValidations::ActionViewHelpersTest < ActionView::TestCase
       :cost => {
         :presence => {
           :message => "can't be blank",
-          :unless => :do_not_validate?
+          :unless => :cannot_validate?
         }
       },
       :title => {
         :presence => {
           :message => "can't be blank",
-          :if => :do_validate?
+          :if => :can_validate?
         }
       }
     }
 
     @post.title = nil
-    @post.stubs(:do_not_validate?).returns(false)
-    @post.stubs(:do_validate?).returns(true)
+    @post.stubs(:cannot_validate?).returns(false)
+    @post.stubs(:can_validate?).returns(true)
     @post.stubs(:client_side_validation_hash).returns(hash)
     form_for(@post, :validate => true) do |f|
       concat f.text_field(:cost)
@@ -393,20 +384,20 @@ class ClientSideValidations::ActionViewHelpersTest < ActionView::TestCase
       :cost => {
         :presence => {
           :message => "can't be blank",
-          :unless => :do_not_validate?
+          :unless => :cannot_validate?
         }
       },
       :title => {
         :presence => {
           :message => "can't be blank",
-          :if => :do_validate?
+          :if => :can_validate?
         }
       }
     }
 
     @post.title = nil
-    @post.stubs(:do_not_validate?).returns(false)
-    @post.stubs(:do_validate?).returns(true)
+    @post.stubs(:cannot_validate?).returns(false)
+    @post.stubs(:can_validate?).returns(true)
     @post.stubs(:client_side_validation_hash).returns(hash)
     form_for(@post, :validate => true) do |f|
       concat f.text_field(:cost, :validate => true)
@@ -429,20 +420,20 @@ class ClientSideValidations::ActionViewHelpersTest < ActionView::TestCase
       :cost => {
         :presence => {
           :message => "can't be blank",
-          :unless => :do_not_validate?
+          :unless => :cannot_validate?
         }
       },
       :title => {
         :presence => {
           :message => "can't be blank",
-          :if => :do_validate?
+          :if => :can_validate?
         }
       }
     }
 
     @post.title = nil
-    @post.stubs(:do_not_validate?).returns(true)
-    @post.stubs(:do_validate?).returns(false)
+    @post.stubs(:cannot_validate?).returns(true)
+    @post.stubs(:can_validate?).returns(false)
     @post.stubs(:client_side_validation_hash).returns(hash)
     form_for(@post, :validate => true) do |f|
       concat f.text_field(:cost, :validate => true)
@@ -462,20 +453,20 @@ class ClientSideValidations::ActionViewHelpersTest < ActionView::TestCase
       :cost => {
         :presence => {
           :message => "can't be blank",
-          :unless => :do_not_validate?
+          :unless => :cannot_validate?
         }
       },
       :title => {
         :presence => {
           :message => "can't be blank",
-          :if => :do_validate?
+          :if => :can_validate?
         }
       }
     }
 
     @post.title = nil
-    @post.stubs(:do_not_validate?).returns(false)
-    @post.stubs(:do_validate?).returns(true)
+    @post.stubs(:cannot_validate?).returns(false)
+    @post.stubs(:can_validate?).returns(true)
     @post.stubs(:client_side_validation_hash).returns(hash)
     form_for(@post, :validate => true) do |f|
       concat f.text_field(:cost, :validate => { :presence => true })
@@ -498,20 +489,20 @@ class ClientSideValidations::ActionViewHelpersTest < ActionView::TestCase
       :cost => {
         :presence => {
           :message => "can't be blank",
-          :unless => :do_not_validate?
+          :unless => :cannot_validate?
         }
       },
       :title => {
         :presence => {
           :message => "can't be blank",
-          :if => :do_validate?
+          :if => :can_validate?
         }
       }
     }
 
     @post.title = nil
-    @post.stubs(:do_not_validate?).returns(true)
-    @post.stubs(:do_validate?).returns(false)
+    @post.stubs(:cannot_validate?).returns(true)
+    @post.stubs(:can_validate?).returns(false)
     @post.stubs(:client_side_validation_hash).returns(hash)
     form_for(@post, :validate => true) do |f|
       concat f.text_field(:cost, :validate => { :presence => true })
@@ -531,20 +522,20 @@ class ClientSideValidations::ActionViewHelpersTest < ActionView::TestCase
       :cost => {
         :presence => {
           :message => "can't be blank",
-          :unless => Proc.new { |post| post.do_not_validate? }
+          :unless => Proc.new { |post| post.cannot_validate? }
         }
       },
       :title => {
         :presence => {
           :message => "can't be blank",
-          :if => Proc.new { |post| post.do_validate? }
+          :if => Proc.new { |post| post.can_validate? }
         }
       }
     }
 
     @post.title = nil
-    @post.stubs(:do_not_validate?).returns(false)
-    @post.stubs(:do_validate?).returns(true)
+    @post.stubs(:cannot_validate?).returns(false)
+    @post.stubs(:can_validate?).returns(true)
     @post.stubs(:client_side_validation_hash).returns(hash)
     form_for(@post, :validate => true) do |f|
       concat f.text_field(:cost, :validate => true)
